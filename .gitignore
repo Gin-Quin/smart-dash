@@ -1,0 +1,34 @@
+# Node/Bun dependencies
+node_modules/
+
+# Build outputs and framework artifacts
+dist/
+build/
+.output/
+.solid/
+.vite/
+.cache/
+tmp/
+coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
