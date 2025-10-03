@@ -35,7 +35,7 @@
 
 <!-- Header -->
 <header
-	class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b h-16"
+	class="fixed top-0 left-0 right-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b h-16"
 >
 	<div class="container mx-auto px-4 sm:px-6 lg:px-8">
 		<div class="flex items-center justify-between h-16">
@@ -97,11 +97,9 @@
 </main>
 
 <!-- Footer -->
-<footer class="bg-neutral-0 text-neutral-1000 py-12">
+<footer class="text-neutral-1000 py-12">
 	<div class="container mx-auto px-4 sm:px-6 lg:px-8">
-		<div
-			class="bg-neutral-0 to-primary-50 p-8 sm:p-12 text-neutral-1000 border-t-neutral-300 border-t-1"
-		>
+		<div class="p-8 sm:p-12 text-neutral-1000 border-t-neutral-300 border-t-1">
 			<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
 				<div class="md:col-span-2">
 					<div class="flex items-center space-x-2 mb-4">

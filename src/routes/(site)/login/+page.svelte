@@ -15,7 +15,10 @@
 	import { page } from "$app/state";
 	import { goto } from "$app/navigation";
 	import PinInput from "$lib/components/PinInput.svelte";
-	import type { sendAuthenticationEmail } from "$lib/server/login/index.remote";
+	import {
+		sendAuthenticationEmail,
+		verifyCode,
+	} from "$lib/services/login/index.remote";
 
 	const content = defineContent({
 		en: {
@@ -42,8 +45,6 @@
 	let code = $state("");
 	let loading = $state(false);
 	let invalidToken = $state(false);
-	let authenticationResponse =
-		$state<Awaited<ReturnType<typeof sendAuthenticationEmail>>>();
 
 	const stage = $derived(page.url.searchParams.get("stage"));
 
@@ -56,31 +57,35 @@
 		if (stage != "code") {
 			console.log("Email login:", { email });
 			page.url.searchParams.set("stage", "code");
-			authenticationResponse = await sendAuthenticationEmail({ email });
+			page.url.searchParams.set("email", email);
+			await sendAuthenticationEmail({ email });
 			await goto(page.url);
 		} else {
+			email ||= page.url.searchParams.get("email") ?? "";
+			if (!email) return goto("/login");
+
 			console.log("Code:", { code });
-			// const response = await verifyCode({ email, code });
-			// console.log("verifyCode response:", response);
-			// if (response) {
-			// 	localStorage.setItem("bearer", response);
-			// 	goto("/");
-			// } else {
-			// 	invalidToken = true;
-			// 	loading = false;
-			// }
+			const response = await verifyCode({ email, code });
+			console.log("verifyCode response:", response);
+			if (response) {
+				localStorage.setItem("bearer", response);
+				goto("/app");
+			} else {
+				invalidToken = true;
+				loading = false;
+			}
 		}
 
 		loading = false;
 	}
 
 	function handleGoogleLogin() {
-		// TODO: Implement Google SSO
+		window.location.href = "/auth/google";
 		console.log("Google SSO login");
 	}
 
 	function handleGithubLogin() {
-		// TODO: Implement GitHub SSO
+		window.location.href = "/auth/github";
 		console.log("GitHub SSO login");
 	}
 </script>

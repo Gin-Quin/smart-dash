@@ -18,6 +18,7 @@ This ensures all agents and developers have up-to-date information about the pro
 - **Svelte 5**: Latest version with runes syntax ($props, reactive declarations)
 - **SvelteKit**: Full-stack framework for routing and SSR capabilities
 - **TypeScript**: For type safety and better development experience
+- **Arctic**: OAuth 2.0 library for handling Google and GitHub authentication
 
 ### **Svelte 5 Syntax Guidelines**
 - **Event Handlers**: Use `onclick={...}` instead of `on:click={...}` (new Svelte 5 syntax)
@@ -52,8 +53,15 @@ This ensures all agents and developers have up-to-date information about the pro
 
 ## 🧑‍💻 **Code guidelines**
 
+⚠️ IMPORTANT ⚠️
+
 - When using Tailwind classes, use `gap-*` instead of `space-*` for consistent spacing.
+- Never use margin, only padding. If you really need margin, then create a parent element with padding instead.
 - Use `flex` and `flex-col` for vertical layouts, and `flex-row` for horizontal layouts.
+- Never use raw colors like "blue" or "red". Instead, use "neutral", "primary", "secondary", "tertiary", "quaternary", or "quinary". For levels of gray, use neutral. neutral-0 is white, and neutral-1000 is black (inverted for dark mode). Examples: "text-primary" or "bg-secondary-400".
+- Use components in `$lib/components`. Never use raw button or input, but rather `<Button>` or `<Input>`.
+- For icons, use Lucide icons with `lucide-svelte` library.
+
 
 ## 📁 **File Structure**
 ```
@@ -110,3 +118,153 @@ The core features of smart-dash are available for every plan:
   }
 </script>
 ```
+
+## 🔐 **Google OAuth Authentication System**
+
+**Added**: Minimal Google OAuth 2.0 implementation for SSO authentication
+
+**Why**: To allow users to sign in with Google and retrieve their email, name, and profile picture.
+
+**Location**: `src/lib/services/google/`
+
+### Architecture
+
+The authentication system uses the **Arctic** library for OAuth handling with a simple two-route flow:
+
+1. **Login Route** (`/auth/google`): Initiates OAuth flow
+   - Generates CSRF state token
+   - Stores state in httpOnly cookie
+   - Redirects to Google authorization
+
+2. **Callback Route** (`/auth/google/callback`): Handles OAuth response
+   - Validates state token (CSRF protection)
+   - Exchanges code for access token
+   - Fetches user info (email, name, avatar)
+   - Returns `GoogleUser` object
+
+### Required Environment Variables
+
+```env
+GOOGLE_CLIENT_ID=your_client_id_here
+GOOGLE_CLIENT_SECRET=your_client_secret_here
+GOOGLE_REDIRECT_URI=http://localhost:3715/auth/google/callback
+```
+
+### Usage
+
+**Trigger login from any component:**
+```svelte
+<a href="/auth/google">
+  <button>Sign in with Google</button>
+</a>
+```
+
+**Access user data in callback:**
+```typescript
+import { getUserInfo } from "$lib/services/google/index.remote";
+
+const user = await getUserInfo(code);
+// Returns: { email: string, name: string, avatar: string }
+```
+
+### API Functions
+
+- `getAuthorizationUrl(state: string): URL` - Generates Google OAuth URL
+- `getUserInfo(code: string): Promise<GoogleUser>` - Fetches user data from Google
+
+### Security Features
+
+- CSRF protection via state parameter
+- HttpOnly cookies for state storage
+- Secure cookies in production
+- 10-minute state expiration
+
+### Important Notes
+
+⚠️ **The callback endpoint currently does NOT include**:
+- Database user storage
+- Session management
+- Authentication cookies
+
+You must implement these yourself based on your needs. See `src/lib/services/google/README.md` for complete implementation examples.
+
+### Setup Guide
+
+Full setup instructions available at: `src/lib/services/google/README.md`
+
+## 🔐 **GitHub OAuth Authentication System**
+
+**Added**: Minimal GitHub OAuth 2.0 implementation for SSO authentication
+
+**Why**: To allow users to sign in with GitHub and retrieve their email, name, and profile picture.
+
+**Location**: `src/lib/services/github/`
+
+### Architecture
+
+The authentication system uses the **Arctic** library for OAuth handling with a simple two-route flow:
+
+1. **Login Route** (`/auth/github`): Initiates OAuth flow
+   - Generates CSRF state token
+   - Stores state in httpOnly cookie
+   - Redirects to GitHub authorization
+
+2. **Callback Route** (`/auth/github/callback`): Handles OAuth response
+   - Validates state token (CSRF protection)
+   - Exchanges code for access token
+   - Fetches user info (email, name, avatar)
+   - Handles private emails by fetching from separate endpoint
+   - Returns `GitHubUser` object
+
+### Required Environment Variables
+
+```env
+GITHUB_CLIENT_ID=your_client_id_here
+GITHUB_CLIENT_SECRET=your_client_secret_here
+```
+
+**Note**: GitHub doesn't require a redirect URI in the client initialization - it's configured in your GitHub OAuth App settings.
+
+### Usage
+
+**Trigger login from any component:**
+```svelte
+<a href="/auth/github">
+  <button>Sign in with GitHub</button>
+</a>
+```
+
+**Access user data in callback:**
+```typescript
+import { getUserInfo } from "$lib/services/github/getUserInfo";
+
+const user = await getUserInfo(code);
+// Returns: { email: string, name: string, picture: string }
+```
+
+### API Functions
+
+- `getAuthorizationUrl(state: string): URL` - Generates GitHub OAuth URL
+- `getUserInfo(code: string): Promise<GitHubUser>` - Fetches user data from GitHub
+
+### Security Features
+
+- CSRF protection via state parameter
+- HttpOnly cookies for state storage
+- Secure cookies in production
+- 10-minute state expiration
+- Handles private GitHub emails by fetching from `/user/emails` endpoint
+
+### Important Notes
+
+⚠️ **GitHub-specific considerations**:
+- GitHub users can set their email as private, so the system fetches from the `/user/emails` endpoint if needed
+- Prioritizes primary verified email, falls back to first verified email, then any email
+- User's display name falls back to their GitHub username if no name is set
+
+### Implementation Details
+
+The GitHub SSO follows the same pattern as Google OAuth:
+- Database user upsert based on email
+- Session creation using `createSession` service
+- Session token stored in localStorage and redirects to `/app`

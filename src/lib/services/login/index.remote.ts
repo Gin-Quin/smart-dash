@@ -6,7 +6,7 @@ import { mainDB } from "$lib/databases/main/mainDB";
 import { createAuthenticationCodes } from "./createAuthenticationCodes";
 import { MINUTE } from "$lib/time/units";
 import { createSession } from "./createSession";
-import { sendSignInEmail } from "$lib/server/email/sendSignInEmail";
+import { sendSignInEmail } from "$lib/services/email/sendSignInEmail";
 
 /**
  * Retrieves the currently authenticated user from the request
@@ -29,14 +29,14 @@ export const sendAuthenticationEmail = command(
 	v.object({
 		email: v.string(),
 	}),
-	async ({ email }): Promise<"success" | "user not found"> => {
+	async ({ email }): Promise<void> => {
 		console.log("Sending magic link email:", email);
 
 		// Check if user exists, if not create one
 		const user = await mainDB.user.findUnique({ where: { email } });
 
 		if (!user) {
-			return "user not found";
+			await mainDB.user.create({ data: { email, region: "europe" } });
 		}
 
 		// Create magic link token
@@ -44,8 +44,6 @@ export const sendAuthenticationEmail = command(
 
 		// Send magic link email
 		await sendSignInEmail(email, codes);
-
-		return "success";
 	},
 );
 
@@ -102,7 +100,7 @@ export const verifyCode = command(
 		});
 
 		if (!verification) {
-			console.log("Verification not found");
+			console.log(`Code [${code}]: Verification not found for email ${email}`);
 			return null;
 		}
 

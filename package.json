@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev --port 3715",
+		"dev": "bun vite dev --port 3715",
 		"dev:turso": "echo 'Not needed anymore' # turso dev --db-file ./data/main.db",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -42,8 +42,10 @@
 		"@paralleldrive/cuid2": "^2.2.2",
 		"@prisma/adapter-libsql": "^6.16.3",
 		"@prisma/client": "^6.16.3",
+		"arctic": "^3.7.0",
 		"lucide-svelte": "^0.544.0",
 		"prisma": "^6.16.3",
+		"svelte-sonner": "^1.0.5",
 		"valibot": "^1.1.0"
 	}
 }

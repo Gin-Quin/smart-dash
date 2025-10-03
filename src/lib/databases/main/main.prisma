@@ -32,9 +32,11 @@ model User {
   email     String   @unique
   role      UserRole @default(user)
   name      String?
-  region    Region
+  region    Region?
+  picture   String?
 
   sessions Session[]
+  projects ProjectMember[]
 }
 
 model DeletedUser {
@@ -70,4 +72,123 @@ model AuthenticationToken {
   token      String
   attempts   Int                   @default(0)
   consumedBy AuthenticationMethod?
+}
+
+// ----------------------- PROJECT ----------------------- //
+
+enum ProjectRole {
+  owner
+  collaborator
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  name        String
+  description String?
+
+  members    ProjectMember[]
+  sources    Datasource[]
+  queries    Query[]
+  dashboards Dashboard[]
+  parameters Parameter[]
+}
+
+model ProjectMember {
+  id        String      @id @default(uuid())
+  createdAt DateTime    @default(now())
+  userId    String
+  projectId String
+  role      ProjectRole @default(collaborator)
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+}
+
+// ---------------------- DATASOURCE ---------------------- //
+
+enum DatasourceType {
+  postgresql
+  mysql
+  mongodb
+  sqlite
+  libsql
+  custom
+}
+
+model Datasource {
+  id        String         @id @default(uuid())
+  createdAt DateTime       @default(now())
+  projectId String
+  type      DatasourceType
+  name      String
+  detail    Json
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ------------------------ QUERY ------------------------ //
+
+enum QueryType {
+  table
+
+  area
+  line
+  bar
+  pie
+  arc
+  scatter
+  dot
+  radar
+  map
+}
+
+model Query {
+  id           String    @id @default(uuid())
+  createdAt    DateTime  @default(now())
+  projectId    String
+  datasourceId String
+  name         String
+  type         QueryType
+  query        String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------- DASHBOARD ---------------------- //
+
+model Dashboard {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  projectId String
+  name      String
+  content   Json
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------- PARAMETER ---------------------- //
+
+enum ParameterType {
+  string
+  number
+  boolean
+  date
+  time
+  datetime
+  json
+}
+
+model Parameter {
+  id           String        @id @default(uuid())
+  createdAt    DateTime      @default(now())
+  projectId    String
+  name         String
+  type         ParameterType
+  defaultValue Json
+  detail       Json
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
