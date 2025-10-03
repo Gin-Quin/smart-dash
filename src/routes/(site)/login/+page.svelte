@@ -15,10 +15,7 @@
 	import { page } from "$app/state";
 	import { goto } from "$app/navigation";
 	import PinInput from "$lib/components/PinInput.svelte";
-	import {
-		sendAuthenticationEmail,
-		verifyCode,
-	} from "../../api/login/login.remote";
+	import type { sendAuthenticationEmail } from "$lib/server/login/index.remote";
 
 	const content = defineContent({
 		en: {

@@ -1,4 +1,4 @@
-import { PrismaClient } from "./client";
+import { PrismaClient } from "./generated/client";
 import { PrismaLibSQL } from "@prisma/adapter-libsql";
 
 const { TURSO_DATABASE_URL, TURSO_AUTH_TOKEN } = process.env;

@@ -39,4 +39,4 @@ Thumbs.db
 .svelte-kit/
 
 # Ignore generated database client
-src/lib/databases/main/client
+generated/

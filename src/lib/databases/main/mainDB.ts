@@ -1,4 +1,4 @@
-import { PrismaClient } from "./client";
+import { PrismaClient } from "./generated/client";
 import { PrismaLibSQL } from "@prisma/adapter-libsql";
 
 import { env } from "$env/dynamic/private";
