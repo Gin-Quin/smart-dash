@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./data/main.db"
+}
+
+model Migration {
+  name      String   @id
+  appliedAt DateTime @default(now())
+}
+
+// ------------------------ USERS ------------------------ //
+
+enum UserRole {
+  admin
+  user
+}
+
+enum Region {
+  america
+  europe
+  asia
+}
+
+model User {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  email     String   @unique
+  role      UserRole @default(user)
+  name      String?
+  region    Region
+
+  sessions Session[]
+}
+
+model DeletedUser {
+  id        String   @id
+  createdAt DateTime
+  email     String
+  role      UserRole
+  name      String
+  region    Region
+
+  deletedAt DateTime @default(now())
+}
+
+// -------------------- AUTHENTICATION -------------------- //
+
+enum AuthenticationMethod {
+  code
+  token
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model AuthenticationToken {
+  id         String                @id @default(uuid())
+  createdAt  DateTime              @default(now())
+  email      String
+  code       String
+  token      String
+  attempts   Int                   @default(0)
+  consumedBy AuthenticationMethod?
+}
