@@ -1,39 +1,34 @@
-<script lang="ts">
-	import favicon from "$lib/assets/favicon.svg";
-	import { onMount } from "svelte";
-	import { Toaster } from "svelte-sonner";
+	import Loader from "$lib/components/Loader.svelte";
+	import { context } from "./context.svelte";
 
 	let { children } = $props();
 
-	onMount(() => {
-		const originalFetch = window.fetch;
-
-		globalThis.fetch = ((...args) => {
-			const bearer = localStorage.getItem("bearer");
-
-			if (bearer) {
-				// If there's a bearer token, add the Authorization header
-				const [url, init = {}] = args;
-				const headers = new Headers(init.headers);
-				headers.set("Authorization", `Bearer ${bearer}`);
-
-				args[1] = {
-					...init,
-					headers,
-				};
-			}
-
-			return originalFetch.apply(globalThis, args);
-		}) as typeof globalThis.fetch;
-	});
+	// $effect(() => {
+	// 	if (context.user) {
+	// 		if (context.projects) {
+	// 			loading = false;
+	// 		}
+	// 	} else if (!localStorage.getItem("bearer")) {
+	// 		goto("/login");
+	// 	} else if (!localStorage.getItem("user")) {
+	// 		getCurrentUser().then((user) => {
+	// 			if (!user) {
+	// 				console.log("User from bearer not found");
+	// 				localStorage.removeItem("bearer");
+	// 				goto("/login");
+	// 			} else {
+	// 				setContextUser(user);
+	// 			}
+	// 		});
+	// 	} else {
+	// 		context.user = JSON.parse(localStorage.getItem("user")!);
+	// 	}
+	// });
 </script>
 
-<svelte:head>
-	<link rel="icon" href={favicon} />
-</svelte:head>
+<Loader />
 
-<Toaster />
-
-<div class="root min-h-[100dvh]! bg-base-300">
+<!--
+<div class="min-h-[100dvh]">
 	{@render children?.()}
-</div>
+</div> -->

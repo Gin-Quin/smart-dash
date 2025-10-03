@@ -1,12 +1,16 @@
-import type { User } from "$lib/databases/main/client";
+import type { Project, User } from "$lib/databases/main/generated/client";
+
+export type UserWithProjects = User & {
+	projects: Project[];
+};
 
 export type Context = {
-	user: User;
+	user?: UserWithProjects;
 };
 
-export const context = $state<Context>({ user: null });
+export const context = $state<Context>({});
 
-export const setContextUser = (user: User | null) => {
-	context.user = user;
-	localStorage.setItem("user", JSON.stringify(user));
-};
+export function setContext(values: Partial<Context>) {
+	Object.assign(context, values);
+	localStorage.setItem("context", JSON.stringify(context));
+}
