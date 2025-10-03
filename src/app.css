@@ -54,6 +54,8 @@
 	--input: oklch(0.9 0.01 250);
 	--ring: var(--primary-500);
 
+	--tw-ring-width: 2px;
+
 	/* Neutral scale - Light theme */
 	--neutral-0: white;
 	--neutral-50: oklch(0.99 0.005 250);

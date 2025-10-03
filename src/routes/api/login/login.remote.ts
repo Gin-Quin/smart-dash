@@ -5,8 +5,8 @@ import { getRequestBearerToken } from "./getRequestBearerToken";
 import { mainDB } from "$lib/databases/main/mainDB";
 import { createAuthenticationCodes } from "./createAuthenticationCodes";
 import { MINUTE } from "$lib/time/units";
-import { createSession } from "../createSession";
-import { sendSignInEmail } from "../email/sendSignInEmail";
+import { createSession } from "./createSession";
+import { sendSignInEmail } from "$lib/server/email/sendSignInEmail";
 
 /**
  * Retrieves the currently authenticated user from the request

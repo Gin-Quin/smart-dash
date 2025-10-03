@@ -18,6 +18,7 @@
 		"generate": "bun prisma generate --schema src/lib/databases/main/main.prisma"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "^2.2.5",
 		"@internationalized/date": "^3.8.1",
 		"@lucide/svelte": "^0.544.0",
 		"@sveltejs/adapter-auto": "^6.0.0",
