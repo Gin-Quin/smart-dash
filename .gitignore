@@ -1,6 +1,8 @@
 # Node/Bun dependencies
 node_modules/
 
+data/
+
 # Build outputs and framework artifacts
 dist/
 build/
@@ -32,3 +34,9 @@ Thumbs.db
 # Editor/IDE
 .vscode/
 .idea/
+
+# SvelteKit
+.svelte-kit/
+
+# Ignore generated database client
+src/lib/databases/main/client
